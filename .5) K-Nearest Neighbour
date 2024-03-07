@@ -1,32 +1,26 @@
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import classification_report, confusion_matrix,accuracy_score
-from sklearn import datasets
+from collections import Counter
+import numpy as np
 
+class KNN:
+    def __init__(self, k=3):
+        self.k = k
 
+    def fit(self, X, y):
+        self.X_train = X
+        self.y_train = y
 
-iris=datasets.load_iris()
+    def predict(self, X):
+        distances = [np.linalg.norm(x_train - X) for x_train in self.X_train]
+        k_indices = np.argsort(distances)[:self.k]
+        k_labels = [self.y_train[i] for i in k_indices]
+        most_common = Counter(k_labels).most_common(1)
+        return most_common[0][0]
 
-x = iris.data
-y = iris.target
+X_train = np.array([[1, 2], [2, 3], [3, 4], [4, 5]])
+y_train = np.array([0, 0, 1, 1])
+X_test = np.array([5, 6])
 
-
-print('class: 0-Iris-Setosa, 1- Iris-Versicolour, 2- Iris-Virginica')
-print(y)
-
-x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.2)
-
-
-model = KNeighborsClassifier(n_neighbors=5)
-model.fit(x_train, y_train)
-
-#To make predictions on our test data
-y_pred=model.predict(x_test)
-
-
-print('Confusion Matrix')
-print(confusion_matrix(y_test,y_pred))
-print('classification_report')
-print(classification_report(y_test,y_pred)) 
-acc = accuracy_score(y_test, y_pred)
-print("Accuracy Score:", acc)
+knn = KNN(k=3)
+knn.fit(X_train, y_train)
+prediction = knn.predict(X_test)
+print("Predicted label:", prediction)
