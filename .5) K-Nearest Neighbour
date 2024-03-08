@@ -1,26 +1,19 @@
-from collections import Counter
-import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
 
-class KNN:
-    def __init__(self, k=3):
-        self.k = k
+iris = load_iris()
+X = iris.data
+y = iris.target
 
-    def fit(self, X, y):
-        self.X_train = X
-        self.y_train = y
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    def predict(self, X):
-        distances = [np.linalg.norm(x_train - X) for x_train in self.X_train]
-        k_indices = np.argsort(distances)[:self.k]
-        k_labels = [self.y_train[i] for i in k_indices]
-        most_common = Counter(k_labels).most_common(1)
-        return most_common[0][0]
+knn = KNeighborsClassifier(n_neighbors=3)
 
-X_train = np.array([[1, 2], [2, 3], [3, 4], [4, 5]])
-y_train = np.array([0, 0, 1, 1])
-X_test = np.array([5, 6])
-
-knn = KNN(k=3)
 knn.fit(X_train, y_train)
-prediction = knn.predict(X_test)
-print("Predicted label:", prediction)
+
+y_pred = knn.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
